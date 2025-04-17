@@ -23,37 +23,36 @@ function ViewResume() {
         .select('*')
         .eq('resumeId', resumeId)
         .single();
-  
+
       if (resumeError) {
         console.error('Resume fetch error:', resumeError);
         return;
       }
       // 1.1 Fetch PersonalDetail
-
       const { data: personalData } = await supabase
         .from('personaldetail')
         .select('*')
         .eq('resume_id', resumeId)
         .single();
-      
+
       // 2. Fetch education
       const { data: educationData } = await supabase
         .from('education')
         .select('*')
         .eq('resume_id', resumeId);
-  
+
       // 3. Fetch experience
       const { data: experienceData } = await supabase
         .from('experience')
         .select('*')
         .eq('resume_id', resumeId);
-  
+
       // 4. Fetch skills
       const { data: skillsData } = await supabase
         .from('skills')
         .select('*')
         .eq('resume_id', resumeId);
-  
+
       // 5. Combine into one object
       const fullResume = {
         ...resumeData,
@@ -62,13 +61,12 @@ function ViewResume() {
         Experience: experienceData || [],
         skills: skillsData || [],
       };
-  
+
       setResumeInfo(fullResume);
     } catch (err) {
       console.error('Unexpected error:', err);
     }
   };
-  
 
   const HandleDownload = () => {
     window.print();
@@ -79,15 +77,21 @@ function ViewResume() {
       <div id="no-print">
         <Header />
 
-        <div className="my-10 mx-10 md:mx-20 lg:mx-36">
-          <h2 className="text-center text-2xl font-medium">
+        <div className="my-5 px-5 md:my-10 md:px-20 lg:px-36">
+          <h2 className="text-center text-xl md:text-2xl font-medium">
             Congrats! Your Ultimate AI-generated Resume is ready!
           </h2>
-          <p className="text-center text-gray-400">
+          <p className="text-center text-gray-400 text-sm md:text-base">
             Now you can download your resume or share the unique resume URL with friends and family.
           </p>
-          <div className="flex justify-between px-44 my-10">
-            <Button onClick={HandleDownload}>Download</Button>
+
+          <div className="flex flex-col sm:flex-row justify-between items-center my-5 gap-4">
+            <Button
+              onClick={HandleDownload}
+              className="w-full sm:w-auto"
+            >
+              Download
+            </Button>
 
             <RWebShare
               data={{
@@ -97,13 +101,17 @@ function ViewResume() {
               }}
               onClick={() => console.log('Shared successfully!')}
             >
-              <Button>Share</Button>
+              <Button
+                className="w-full sm:w-auto"
+              >
+                Share
+              </Button>
             </RWebShare>
           </div>
         </div>
       </div>
 
-      <div className="my-10 mx-10 md:mx-20 lg:mx-36">
+      <div className="my-5 px-5 md:my-10 md:px-20 lg:px-36">
         <div id="print-area">
           <ResumePreview />
         </div>

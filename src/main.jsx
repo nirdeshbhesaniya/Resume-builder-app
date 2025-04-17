@@ -14,6 +14,7 @@ import ViewResume from './my-resume/[resumeId]/view'
 
 
 
+
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 const router = createBrowserRouter([
   {

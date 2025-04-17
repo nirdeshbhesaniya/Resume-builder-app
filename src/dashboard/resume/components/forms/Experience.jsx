@@ -17,10 +17,11 @@ const emptyForm = {
   end_date: '',
   work_summary: '',
 };
+// ... imports stay the same
 
 function Experience() {
   const [experienceList, setExperienceList] = useState([]);
-  const { resumeInfo, setResumeInfo } = useContext(ResumeInfoContext);
+  const { setResumeInfo } = useContext(ResumeInfoContext);
   const params = useParams();
   const [loading, setLoading] = useState(false);
 
@@ -86,23 +87,25 @@ function Experience() {
     }
   };
 
-  // 🔁 This syncs updates to the preview in real time
   useEffect(() => {
     setResumeInfo(prev => ({ ...prev, Experience: experienceList }));
-
-    
   }, [experienceList]);
 
   return (
-    <div>
-      <div className='p-5 shadow-lg rounded-lg border-t-primary border-t-4 mt-10'>
-        <h2 className='font-bold text-lg'>Professional Experience</h2>
-        <p>Add your previous job experience</p>
+    <div className='px-4 sm:px-6 md:px-8'>
+      <div className='p-4 sm:p-6 shadow-lg rounded-lg border-t-primary border-t-4 mt-6'>
+        <h2 className='font-bold text-lg sm:text-xl'>Professional Experience</h2>
+        <p className='text-sm text-muted-foreground mb-4'>
+          Add your previous job experience
+        </p>
 
         {experienceList.map((item, index) => (
-          <div key={index} className='grid grid-cols-2 gap-3 border p-3 my-5 rounded-lg'>
+          <div
+            key={index}
+            className='grid grid-cols-1 sm:grid-cols-2 gap-4 border p-4 my-5 rounded-lg'
+          >
             <div>
-              <label className='text-xs'>Position Title</label>
+              <label className='text-xs mb-1 block'>Position Title</label>
               <Input
                 name='position_title'
                 value={item.position_title}
@@ -110,7 +113,7 @@ function Experience() {
               />
             </div>
             <div>
-              <label className='text-xs'>Company Name</label>
+              <label className='text-xs mb-1 block'>Company Name</label>
               <Input
                 name='company_name'
                 value={item.company_name}
@@ -118,7 +121,7 @@ function Experience() {
               />
             </div>
             <div>
-              <label className='text-xs'>City</label>
+              <label className='text-xs mb-1 block'>City</label>
               <Input
                 name='city'
                 value={item.city}
@@ -126,7 +129,7 @@ function Experience() {
               />
             </div>
             <div>
-              <label className='text-xs'>State</label>
+              <label className='text-xs mb-1 block'>State</label>
               <Input
                 name='state'
                 value={item.state}
@@ -134,7 +137,7 @@ function Experience() {
               />
             </div>
             <div>
-              <label className='text-xs'>Start Date</label>
+              <label className='text-xs mb-1 block'>Start Date</label>
               <Input
                 type='date'
                 name='start_date'
@@ -143,7 +146,7 @@ function Experience() {
               />
             </div>
             <div>
-              <label className='text-xs'>End Date</label>
+              <label className='text-xs mb-1 block'>End Date</label>
               <Input
                 type='date'
                 name='end_date'
@@ -151,8 +154,8 @@ function Experience() {
                 onChange={e => handleChange(index, e)}
               />
             </div>
-            <div className='col-span-2'>
-              <label className='text-xs'>Summary</label>
+            <div className='col-span-1 sm:col-span-2'>
+              <label className='text-xs mb-1 block'>Summary</label>
               <RichTextEditor
                 index={index}
                 defaultValue={item.work_summary}
@@ -164,16 +167,28 @@ function Experience() {
           </div>
         ))}
 
-        <div className='flex justify-between'>
-          <div className='flex gap-2'>
-            <Button variant='outline' onClick={AddNewExperience} className='text-primary'>
+        <div className='flex flex-col sm:flex-row justify-between gap-4 mt-4'>
+          <div className='flex flex-col sm:flex-row gap-2 w-full sm:w-auto'>
+            <Button
+              variant='outline'
+              onClick={AddNewExperience}
+              className='text-primary w-full sm:w-auto'
+            >
               + Add More Experience
             </Button>
-            <Button variant='outline' onClick={RemoveExperience} className='text-primary'>
+            <Button
+              variant='outline'
+              onClick={RemoveExperience}
+              className='text-primary w-full sm:w-auto'
+            >
               - Remove
             </Button>
           </div>
-          <Button disabled={loading} onClick={onSave}>
+          <Button
+            onClick={onSave}
+            disabled={loading}
+            className='w-full sm:w-auto'
+          >
             {loading ? <LoaderCircle className='animate-spin' /> : 'Save'}
           </Button>
         </div>

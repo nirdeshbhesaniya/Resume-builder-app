@@ -69,10 +69,8 @@ function Education() {
   const onSave = async () => {
     setLoading(true)
     try {
-      // Delete existing entries for the resume
       await supabase.from('education').delete().eq('resume_id', params.resumeId)
 
-      // Insert new ones
       const toInsert = educationalList.map((item) => ({
         ...item,
         resume_id: params.resumeId
@@ -98,59 +96,67 @@ function Education() {
   }, [educationalList])
 
   return (
-    <div className='p-5 shadow-lg rounded-lg border-t-primary border-t-4 mt-10'>
-      <h2 className='font-bold text-lg'>Education</h2>
-      <p>Add Your educational details</p>
+    <div className="p-4 sm:p-5 shadow-lg rounded-lg border-t-primary border-t-4 mt-10">
+      <h2 className="font-bold text-lg">Education</h2>
+      <p className="text-sm text-muted-foreground mb-4">Add your educational details</p>
 
-      <div>
+      <div className="space-y-5">
         {educationalList.map((item, index) => (
-          <div key={index} className='grid grid-cols-2 gap-3 border p-3 my-5 rounded-lg'>
-            <div className='col-span-2'>
-              <label>University Name</label>
+          <div
+            key={index}
+            className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-4 border p-4 rounded-lg"
+          >
+            <div className="col-span-1 sm:col-span-2">
+              <label className="text-sm font-medium">University Name</label>
               <Input
-                name='university_name'
+                name="university_name"
                 onChange={(e) => handleChange(e, index)}
                 value={item.university_name}
               />
             </div>
+
             <div>
-              <label>Degree</label>
+              <label className="text-sm font-medium">Degree</label>
               <Input
-                name='degree'
+                name="degree"
                 onChange={(e) => handleChange(e, index)}
                 value={item.degree}
               />
             </div>
+
             <div>
-              <label>Major</label>
+              <label className="text-sm font-medium">Major</label>
               <Input
-                name='major'
+                name="major"
                 onChange={(e) => handleChange(e, index)}
                 value={item.major}
               />
             </div>
+
             <div>
-              <label>Start Date</label>
+              <label className="text-sm font-medium">Start Date</label>
               <Input
-                type='date'
-                name='start_date'
+                type="date"
+                name="start_date"
                 onChange={(e) => handleChange(e, index)}
                 value={item.start_date}
               />
             </div>
+
             <div>
-              <label>End Date</label>
+              <label className="text-sm font-medium">End Date</label>
               <Input
-                type='date'
-                name='end_date'
+                type="date"
+                name="end_date"
                 onChange={(e) => handleChange(e, index)}
                 value={item.end_date}
               />
             </div>
-            <div className='col-span-2'>
-              <label>Description</label>
+
+            <div className="col-span-1 sm:col-span-2">
+              <label className="text-sm font-medium">Description</label>
               <Textarea
-                name='description'
+                name="description"
                 onChange={(e) => handleChange(e, index)}
                 value={item.description}
               />
@@ -159,17 +165,22 @@ function Education() {
         ))}
       </div>
 
-      <div className='flex justify-between'>
-        <div className='flex gap-2'>
-          <Button variant='outline' onClick={AddNewEducation} className='text-primary'>
+      <div className="flex flex-col sm:flex-row justify-between gap-3 mt-6">
+        <div className="flex gap-2 flex-col sm:flex-row">
+          <Button variant="outline" onClick={AddNewEducation} className="text-primary">
             + Add More Education
           </Button>
-          <Button variant='outline' onClick={RemoveEducation} className='text-primary'>
+          <Button
+            variant="outline"
+            onClick={RemoveEducation}
+            className="text-primary"
+            disabled={educationalList.length === 1}
+          >
             - Remove
           </Button>
         </div>
         <Button disabled={loading} onClick={onSave}>
-          {loading ? <LoaderCircle className='animate-spin' /> : 'Save'}
+          {loading ? <LoaderCircle className="animate-spin" /> : 'Save'}
         </Button>
       </div>
     </div>
