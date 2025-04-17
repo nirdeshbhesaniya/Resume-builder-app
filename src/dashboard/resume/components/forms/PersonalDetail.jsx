@@ -11,7 +11,7 @@ function PersonalDetail({ enabledNext }) {
     const params = useParams();
     
     const { resumeInfo, setResumeInfo } = useContext(ResumeInfoContext);
-    console.log("Resume Info Context:", resumeInfo);
+   
     
     const [formData, setFormData] = useState({});
     const [loading, setLoading] = useState(false);

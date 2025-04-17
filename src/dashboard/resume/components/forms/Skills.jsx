@@ -50,7 +50,6 @@ function Skills() {
   const onSave = async () => {
     setLoading(true);
 
-    // Delete existing skills for the resume
     const { error: deleteError } = await supabase
       .from('skills')
       .delete()
@@ -63,7 +62,6 @@ function Skills() {
       return;
     }
 
-    // Insert updated skills
     const skillsToInsert = skillsList.map(skill => ({
       ...skill,
       resume_id: resumeId,
@@ -93,12 +91,12 @@ function Skills() {
   return (
     <div className='p-5 shadow-lg rounded-lg border-t-primary border-t-4 mt-10'>
       <h2 className='font-bold text-lg'>Skills</h2>
-      <p>Add Your top professional key skills</p>
+      <p className='text-sm mb-4'>Add Your top professional key skills</p>
 
-      <div>
+      <div className='space-y-4'>
         {skillsList.map((item, index) => (
-          <div key={index} className='flex justify-between mb-2 border rounded-lg p-3'>
-            <div>
+          <div key={index} className='flex flex-col md:flex-row md:items-center justify-between gap-4 border rounded-lg p-3'>
+            <div className='w-full md:w-1/2'>
               <label className='text-xs'>Name</label>
               <Input
                 className='w-full'
@@ -106,15 +104,18 @@ function Skills() {
                 onChange={(e) => handleChange(index, 'name', e.target.value)}
               />
             </div>
-            <Rating
-              style={{ maxWidth: 120 }}
-              value={item.rating}
-              onChange={(value) => handleChange(index, 'rating', value)}
-            />
+            <div className='md:w-auto'>
+              <Rating
+                style={{ maxWidth: 120 }}
+                value={item.rating}
+                onChange={(value) => handleChange(index, 'rating', value)}
+              />
+            </div>
           </div>
         ))}
       </div>
-      <div className='flex justify-between'>
+
+      <div className='flex flex-col sm:flex-row justify-between items-center mt-4 gap-3'>
         <div className='flex gap-2'>
           <Button variant='outline' onClick={addNewSkill} className='text-primary'>
             + Add More Skill
@@ -123,7 +124,7 @@ function Skills() {
             - Remove
           </Button>
         </div>
-        <Button disabled={loading} onClick={onSave}>
+        <Button disabled={loading} onClick={onSave} className='w-full sm:w-auto'>
           {loading ? <LoaderCircle className='animate-spin' /> : 'Save'}
         </Button>
       </div>
