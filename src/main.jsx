@@ -36,7 +36,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/auth/sign-in",
-    element: <SignInPage />,
+    element: <SignInPage routing="path" path="/auth/sign-in" />,
   },
   {
     path: "/my-resume/:resumeId/view",
