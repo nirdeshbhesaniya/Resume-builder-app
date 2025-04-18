@@ -17,27 +17,52 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
 } from "@/components/ui/alert-dialog"
-import { supabase } from "../../../services/supabaseClient"
+import { useSupabaseWithClerk } from "../../../services/supabaseClient"
 import { toast } from 'sonner'
 
 function ResumeCardItem({ resume, refreshData }) {
   const navigation = useNavigate()
   const [openAlert, setOpenAlert] = useState(false)
   const [loading, setLoading] = useState(false)
+  const { getSupabaseClient } = useSupabaseWithClerk()
 
   const onDelete = async () => {
     setLoading(true)
-    const { error } = await supabase
-      .from('resume')  // Ensure this is the correct table name
-      .delete()
-      .match({ resumeId: resume.resumeId })
+    const supabase = await getSupabaseClient()
 
-    if (error) {
-      console.error('Error deleting resume:', error)
-      toast.error('Failed to delete resume!')
-    } else {
-      toast.success('Resume deleted successfully!')
-      refreshData() // Refresh data after deleting
+    try {
+      // 1. Delete related tables first
+      const relatedTables = ['experience', 'education', 'skills', 'personaldetail']
+
+      for (const table of relatedTables) {
+        const { error } = await supabase
+          .from(table)
+          .delete()
+          .eq('resume_id', resume.resumeId)
+
+        if (error) {
+          console.error(`Error deleting from ${table}:`, error)
+          throw new Error(`Failed to delete ${table}`)
+        }
+      }
+
+      // 2. Now delete the resume
+      const { error: resumeError } = await supabase
+        .from('resume')
+        .delete()
+        .match({ resumeId: resume.resumeId })
+
+      if (resumeError) {
+        console.error('Error deleting resume:', resumeError)
+        toast.error('Failed to delete resume!')
+      } else {
+        toast.success('Resume deleted successfully!')
+        refreshData()
+      }
+
+    } catch (err) {
+      console.error('Deletion error:', err)
+      toast.error('Resume deletion failed. Check logs.')
     }
 
     setLoading(false)
@@ -48,18 +73,15 @@ function ResumeCardItem({ resume, refreshData }) {
     <div className="">
       <Link to={'/dashboard/resume/' + resume.resumeId + "/edit"}>
         <div className="p-14 bg-gradient-to-b from-pink-100 via-purple-200 to-blue-200 h-[280px] rounded-t-lg border-t-4"
-          style={{
-            borderColor: resume?.themeColor
-          }}>
+          style={{ borderColor: resume?.themeColor }}>
           <div className="flex items-center justify-center h-[180px]">
             <img src="/cv.png" width={80} height={80} />
           </div>
         </div>
       </Link>
+
       <div className="border p-3 flex justify-between text-white rounded-b-lg shadow-lg"
-        style={{
-          background: resume?.themeColor
-        }}>
+        style={{ background: resume?.themeColor }}>
         <h2 className="text-sm text-gray-900 font-bold">{resume.title}</h2>
         <DropdownMenu>
           <DropdownMenuTrigger>

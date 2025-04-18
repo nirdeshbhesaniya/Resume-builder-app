@@ -6,12 +6,13 @@ import { LoaderCircle } from 'lucide-react'
 import React, { useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { toast } from 'sonner'
-import { supabase } from '../../../../../services/supabaseClient'
+import { useSupabaseWithClerk } from '../../../../../services/supabaseClient'
 
 function Education() {
   const [loading, setLoading] = useState(false)
   const { resumeInfo, setResumeInfo } = useContext(ResumeInfoContext)
   const params = useParams()
+  const { getSupabaseClient } = useSupabaseWithClerk()
   const [educationalList, setEducationalList] = useState([
     {
       university_name: '',
@@ -28,6 +29,7 @@ function Education() {
   }, [])
 
   const fetchEducation = async () => {
+    const supabase = await getSupabaseClient()
     const { data, error } = await supabase
       .from('education')
       .select('*')
@@ -63,23 +65,28 @@ function Education() {
   }
 
   const RemoveEducation = () => {
-    setEducationalList(educationalList.slice(0, -1))
+    if (educationalList.length > 1) {
+      setEducationalList(educationalList.slice(0, -1))
+    }
   }
 
   const onSave = async () => {
     setLoading(true)
+    const supabase = await getSupabaseClient()
     try {
+      // Clear old records
       await supabase.from('education').delete().eq('resume_id', params.resumeId)
 
       const toInsert = educationalList.map((item) => ({
         ...item,
         resume_id: params.resumeId
       }))
+
       const { error } = await supabase.from('education').insert(toInsert)
 
       if (error) throw error
 
-      toast.success('Details updated!')
+      toast.success('Education details updated!')
     } catch (error) {
       console.error(error)
       toast.error('Server error. Please try again!')

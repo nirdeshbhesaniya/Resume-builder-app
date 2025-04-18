@@ -2,14 +2,14 @@ import React, { useEffect, useState } from 'react'
 import AddResume from './components/AddResume'
 import { useUser } from '@clerk/clerk-react'
 import ResumeCardItem from './components/ResumeCardItem'
-import { supabase } from '../../services/supabaseClient'
+import { useSupabaseWithClerk }from '../../services/supabaseClient'
 import { Loader2Icon } from 'lucide-react'
 
 function Dashboard() {
   const { user } = useUser()
   const [resumeList, setResumeList] = useState([])
   const [loading, setLoading] = useState(true)
-
+  const { getSupabaseClient } = useSupabaseWithClerk()
   useEffect(() => {
     if (user) {
       getResumesList()
@@ -21,7 +21,7 @@ function Dashboard() {
    */
   const getResumesList = async () => {
     setLoading(true)
-
+    const supabase = await getSupabaseClient()
     const { data, error } = await supabase
       .from('resume') // Make sure this matches your table name
       .select('*')

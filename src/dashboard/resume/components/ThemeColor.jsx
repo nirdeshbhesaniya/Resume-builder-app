@@ -9,7 +9,7 @@ import { LayoutGrid } from 'lucide-react';
 import { ResumeInfoContext } from '../../../context/ResumeInfoContext';
 import { useParams } from 'react-router-dom';
 import { toast } from 'sonner';
-import { supabase } from '../../../../services/supabaseClient'; // Make sure this points to your initialized Supabase client
+import { useSupabaseWithClerk } from '../../../../services/supabaseClient';
 
 function ThemeColor() {
   const colors = [
@@ -22,6 +22,7 @@ function ThemeColor() {
   const { resumeInfo, setResumeInfo } = useContext(ResumeInfoContext);
   const [selectedColor, setSelectedColor] = useState();
   const { resumeId } = useParams();
+  const { getSupabaseClient } = useSupabaseWithClerk();
 
   useEffect(() => {
     if (resumeInfo?.themeColor) {
@@ -36,8 +37,10 @@ function ThemeColor() {
       themeColor: color
     });
 
+    const supabase = await getSupabaseClient(); // ✅ Corrected line
+
     const { error } = await supabase
-      .from('resume') // replace with your table name if different
+      .from('resume')
       .update({ themeColor: color })
       .eq('resumeId', resumeId);
 

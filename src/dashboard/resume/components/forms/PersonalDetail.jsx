@@ -5,69 +5,65 @@ import { LoaderCircle } from 'lucide-react';
 import React, { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { toast } from 'sonner';
-import { supabase } from '../../../../../services/supabaseClient'; // adjust path if needed
+import { useSupabaseWithClerk } from '../../../../../services/supabaseClient'; // adjust path if needed
 
 function PersonalDetail({ enabledNext }) {
     const params = useParams();
-    
     const { resumeInfo, setResumeInfo } = useContext(ResumeInfoContext);
-   
-    
     const [formData, setFormData] = useState({});
     const [loading, setLoading] = useState(false);
+    const { getSupabaseClient } = useSupabaseWithClerk();
 
-    // Load existing data from Supabase
     useEffect(() => {
         const fetchPersonalDetail = async () => {
-          if (resumeInfo?.firstName) {
-            // If already loaded in context, use that
-            setFormData({
-              firstName: resumeInfo.firstName,
-              lastName: resumeInfo.lastName,
-              jobTitle: resumeInfo.jobTitle,
-              address: resumeInfo.address,
-              phone: resumeInfo.phone,
-              email: resumeInfo.email,
-            });
-            enabledNext(true);
-            return;
-          }
-      
-          const { data, error } = await supabase
-            .from('personaldetail')
-            .select('*')
-            .eq('resume_id', params.resumeId)
-            .maybeSingle();
-      
-          if (error) {
-            console.error("Personal detail fetch error:", error);
-            toast.error('Error fetching personal detail');
-            return;
-          }
-      
-          if (data) {
-            const mappedData = {
-              firstName: data.first_name,
-              lastName: data.last_name,
-              jobTitle: data.job_title,
-              address: data.address,
-              phone: data.phone,
-              email: data.email,
-            };
-            setFormData(mappedData);
-            setResumeInfo({ ...resumeInfo, ...mappedData });
-            enabledNext(true);
-          }
+            const supabase = await getSupabaseClient(); // ✅ Await here
+
+            if (resumeInfo?.firstName) {
+                setFormData({
+                    firstName: resumeInfo.firstName,
+                    lastName: resumeInfo.lastName,
+                    jobTitle: resumeInfo.jobTitle,
+                    address: resumeInfo.address,
+                    phone: resumeInfo.phone,
+                    email: resumeInfo.email,
+                });
+                enabledNext(true);
+                return;
+            }
+
+            const { data, error } = await supabase
+                .from('personaldetail')
+                .select('*')
+                .eq('resume_id', params.resumeId)
+                .maybeSingle();
+
+            if (error) {
+                console.error("Personal detail fetch error:", error);
+                toast.error('Error fetching personal detail');
+                return;
+            }
+
+            if (data) {
+                const mappedData = {
+                    firstName: data.first_name,
+                    lastName: data.last_name,
+                    jobTitle: data.job_title,
+                    address: data.address,
+                    phone: data.phone,
+                    email: data.email,
+                };
+                setFormData(mappedData);
+                setResumeInfo({ ...resumeInfo, ...mappedData });
+                enabledNext(true);
+            }
         };
-      
+
         fetchPersonalDetail();
-      }, []);
-      
+    }, []);
 
     const handleInputChange = (e) => {
         enabledNext(false);
         const { name, value } = e.target;
-
         const updated = { ...formData, [name]: value };
         setFormData(updated);
         setResumeInfo({ ...resumeInfo, [name]: value });
@@ -76,6 +72,8 @@ function PersonalDetail({ enabledNext }) {
     const onSave = async (e) => {
         e.preventDefault();
         setLoading(true);
+
+        const supabase = await getSupabaseClient(); // ✅ Await here
 
         const dataToSave = {
             resume_id: params.resumeId,

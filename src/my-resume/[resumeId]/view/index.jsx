@@ -4,12 +4,13 @@ import { ResumeInfoContext } from '../../../context/ResumeInfoContext';
 import ResumePreview from '../../../dashboard/resume/components/ResumePreview';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { supabase } from '../../../../services/supabaseClient';
+import { useSupabaseWithClerk } from '../../../../services/supabaseClient';
 import { RWebShare } from 'react-web-share';
 
 function ViewResume() {
   const [resumeInfo, setResumeInfo] = useState(null);
   const { resumeId } = useParams();
+  const { getSupabaseClient } = useSupabaseWithClerk();
 
   useEffect(() => {
     fetchResumeInfo();
@@ -17,6 +18,8 @@ function ViewResume() {
 
   const fetchResumeInfo = async () => {
     try {
+      const supabase = await getSupabaseClient(); // ✅ Await the client here
+
       // 1. Fetch main resume info
       const { data: resumeData, error: resumeError } = await supabase
         .from('resume')
@@ -28,6 +31,7 @@ function ViewResume() {
         console.error('Resume fetch error:', resumeError);
         return;
       }
+
       // 1.1 Fetch PersonalDetail
       const { data: personalData } = await supabase
         .from('personaldetail')
@@ -86,10 +90,7 @@ function ViewResume() {
           </p>
 
           <div className="flex flex-col sm:flex-row justify-between items-center my-5 gap-4">
-            <Button
-              onClick={HandleDownload}
-              className="w-full sm:w-auto"
-            >
+            <Button onClick={HandleDownload} className="w-full sm:w-auto">
               Download
             </Button>
 
@@ -101,11 +102,7 @@ function ViewResume() {
               }}
               onClick={() => console.log('Shared successfully!')}
             >
-              <Button
-                className="w-full sm:w-auto"
-              >
-                Share
-              </Button>
+              <Button className="w-full sm:w-auto">Share</Button>
             </RWebShare>
           </div>
         </div>

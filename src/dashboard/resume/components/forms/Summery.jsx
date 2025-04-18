@@ -3,7 +3,7 @@ import { Textarea } from '../../../../components/ui/textarea'
 import { ResumeInfoContext } from '../../../../context/ResumeInfoContext'
 import React, { useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
-import { supabase } from '../../../../../services/supabaseClient';
+import { useSupabaseWithClerk } from '../../../../../services/supabaseClient';
 import { Brain, LoaderCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { AIChatSession } from '../../../../../services/AIModal';
@@ -16,7 +16,7 @@ function Summery({ enabledNext }) {
   const [loading, setLoading] = useState(false);
   const params = useParams();
   const [aiGeneratedSummeryList, setAiGeneratedSummeryList] = useState([]);
-
+  const { getSupabaseClient } = useSupabaseWithClerk()
   useEffect(() => {
     if (summery) {
       setResumeInfo({
@@ -51,6 +51,7 @@ function Summery({ enabledNext }) {
     e.preventDefault();
     try {
       setLoading(true);
+      const supabase = await getSupabaseClient()
       const { error } = await supabase
         .from('resume')
         .update({ summery }) // or 'summary' if your column is named that

@@ -12,18 +12,22 @@ import { Input } from '../../components/ui/input';
 import { v4 as uuidv4 } from 'uuid';
 import { useUser } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../../../services/supabaseClient' // <-- Your client
+import { useSupabaseWithClerk } from '../../../services/supabaseClient'; // <-- Your client
 
 function AddResume() {
   const [openDialog, setOpenDialog] = useState(false);
-  const [resumeTitle, setResumeTitle] = useState();
+  const [resumeTitle, setResumeTitle] = useState('');
   const { user } = useUser();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { getSupabaseClient } = useSupabaseWithClerk();
+
+  const defaultThemeColor = '#FF5733'; // ✅ Default theme color
 
   const onCreate = async () => {
     setLoading(true);
     const uuid = uuidv4();
+    const supabase = await getSupabaseClient();
 
     const { data, error } = await supabase
       .from('resume')
@@ -33,6 +37,7 @@ function AddResume() {
           resumeId: uuid,
           userEmail: user?.primaryEmailAddress?.emailAddress,
           userName: user?.fullName,
+          themeColor: defaultThemeColor, // ✅ Add this line
         },
       ])
       .select()
@@ -65,6 +70,7 @@ function AddResume() {
               <Input
                 className="my-2"
                 placeholder="Ex. Full Stack resume"
+                value={resumeTitle}
                 onChange={(e) => setResumeTitle(e.target.value)}
               />
             </DialogDescription>

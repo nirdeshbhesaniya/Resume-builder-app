@@ -6,7 +6,7 @@ import { ResumeInfoContext } from '../../../../context/ResumeInfoContext';
 import { useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { LoaderCircle } from 'lucide-react';
-import { supabase } from '../../../../../services/supabaseClient';
+import { useSupabaseWithClerk } from '../../../../../services/supabaseClient';
 
 const emptyForm = {
   position_title: '',
@@ -17,19 +17,20 @@ const emptyForm = {
   end_date: '',
   work_summary: '',
 };
-// ... imports stay the same
 
 function Experience() {
   const [experienceList, setExperienceList] = useState([]);
   const { setResumeInfo } = useContext(ResumeInfoContext);
   const params = useParams();
   const [loading, setLoading] = useState(false);
+  const { getSupabaseClient } = useSupabaseWithClerk();
 
   useEffect(() => {
     fetchExperience();
   }, []);
 
   const fetchExperience = async () => {
+    const supabase = await getSupabaseClient();
     const { data, error } = await supabase
       .from('experience')
       .select('*')
@@ -66,6 +67,7 @@ function Experience() {
   const onSave = async () => {
     setLoading(true);
     try {
+      const supabase = await getSupabaseClient();
       await supabase.from('experience').delete().eq('resume_id', params.resumeId);
 
       const insertData = experienceList.map(item => ({
@@ -92,52 +94,56 @@ function Experience() {
   }, [experienceList]);
 
   return (
-    <div className='px-4 sm:px-6 md:px-8'>
-      <div className='p-4 sm:p-6 shadow-lg rounded-lg border-t-primary border-t-4 mt-6'>
-        <h2 className='font-bold text-lg sm:text-xl'>Professional Experience</h2>
-        <p className='text-sm text-muted-foreground mb-4'>
-          Add your previous job experience
+    <div>
+      <div className='p-5 sm:p-6 shadow-lg rounded-xl border-t-4 border-t-primary mt-6 bg-white'>
+        <h2 className='font-bold text-xl sm:text-2xl mb-1'>Professional Experience</h2>
+        <p className='text-sm text-muted-foreground mb-5'>
+          Add your previous job experience details below
         </p>
 
         {experienceList.map((item, index) => (
           <div
             key={index}
-            className='grid grid-cols-1 sm:grid-cols-2 gap-4 border p-4 my-5 rounded-lg'
+            className='grid grid-cols-1 md:grid-cols-2 gap-5 border border-gray-200 p-4 rounded-lg mb-6'
           >
-            <div>
-              <label className='text-xs mb-1 block'>Position Title</label>
+            <div className='w-full'>
+              <label className='text-sm font-medium mb-1 block'>Position Title</label>
               <Input
                 name='position_title'
                 value={item.position_title}
                 onChange={e => handleChange(index, e)}
               />
             </div>
-            <div>
-              <label className='text-xs mb-1 block'>Company Name</label>
+
+            <div className='w-full'>
+              <label className='text-sm font-medium mb-1 block'>Company Name</label>
               <Input
                 name='company_name'
                 value={item.company_name}
                 onChange={e => handleChange(index, e)}
               />
             </div>
-            <div>
-              <label className='text-xs mb-1 block'>City</label>
+
+            <div className='w-full'>
+              <label className='text-sm font-medium mb-1 block'>City</label>
               <Input
                 name='city'
                 value={item.city}
                 onChange={e => handleChange(index, e)}
               />
             </div>
-            <div>
-              <label className='text-xs mb-1 block'>State</label>
+
+            <div className='w-full'>
+              <label className='text-sm font-medium mb-1 block'>State</label>
               <Input
                 name='state'
                 value={item.state}
                 onChange={e => handleChange(index, e)}
               />
             </div>
-            <div>
-              <label className='text-xs mb-1 block'>Start Date</label>
+
+            <div className='w-full'>
+              <label className='text-sm font-medium mb-1 block'>Start Date</label>
               <Input
                 type='date'
                 name='start_date'
@@ -145,8 +151,9 @@ function Experience() {
                 onChange={e => handleChange(index, e)}
               />
             </div>
-            <div>
-              <label className='text-xs mb-1 block'>End Date</label>
+
+            <div className='w-full'>
+              <label className='text-sm font-medium mb-1 block'>End Date</label>
               <Input
                 type='date'
                 name='end_date'
@@ -154,8 +161,9 @@ function Experience() {
                 onChange={e => handleChange(index, e)}
               />
             </div>
-            <div className='col-span-1 sm:col-span-2'>
-              <label className='text-xs mb-1 block'>Summary</label>
+
+            <div className='col-span-1 md:col-span-2'>
+              <label className='text-sm font-medium mb-1 block'>Work Summary</label>
               <RichTextEditor
                 index={index}
                 defaultValue={item.work_summary}
@@ -167,8 +175,9 @@ function Experience() {
           </div>
         ))}
 
-        <div className='flex flex-col sm:flex-row justify-between gap-4 mt-4'>
-          <div className='flex flex-col sm:flex-row gap-2 w-full sm:w-auto'>
+        <div className='flex flex-col md:flex-row gap-3 md:items-center md:justify-between mt-6'>
+          {/* Button group: Add / Remove */}
+          <div className='flex flex-col sm:flex-row gap-3 w-full md:w-auto'>
             <Button
               variant='outline'
               onClick={AddNewExperience}
@@ -184,16 +193,21 @@ function Experience() {
               - Remove
             </Button>
           </div>
-          <Button
-            onClick={onSave}
-            disabled={loading}
-            className='w-full sm:w-auto'
-          >
-            {loading ? <LoaderCircle className='animate-spin' /> : 'Save'}
-          </Button>
+
+          {/* Save button */}
+          <div className='w-full md:w-auto'>
+            <Button
+              onClick={onSave}
+              disabled={loading}
+              className='w-full md:w-auto'
+            >
+              {loading ? <LoaderCircle className='animate-spin' /> : 'Save'}
+            </Button>
+          </div>
         </div>
       </div>
     </div>
+
   );
 }
 
