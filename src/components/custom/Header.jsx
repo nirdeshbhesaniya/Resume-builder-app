@@ -17,7 +17,7 @@ function Header() {
                     </Link>
                     <UserButton />
                 </div> :
-                <Link to={'/auth/sign-in'}>
+                <Link to={'/auth/sign-up'}>
                     <Button style={{ backgroundColor: '#9f5bff' }}>Get Started</Button>
                 </Link>
             }

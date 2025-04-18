@@ -4,13 +4,14 @@ import './index.css'
 import App from './App.jsx'
 import { createBrowserRouter } from 'react-router-dom'
 import SignInPage from './Auth/sign-in/index.jsx'
+import  SignUpPage  from './Auth/sign-up/index.jsx'
+import SignUpCallback from './Auth/pages/SignUpCallback.jsx'
 import { RouterProvider } from 'react-router'
 import Dashboard from './dashboard'
 import { ClerkProvider } from '@clerk/clerk-react'
 import Home from './Home'
 import EditResume from './dashboard/resume/[resumeId]/edit'
 import ViewResume from './my-resume/[resumeId]/view'
-
 
 
 
@@ -35,8 +36,16 @@ const router = createBrowserRouter([
     ]
   },
   {
+    path: "/auth/sign-up",
+    element: <SignUpPage routing="path" path="/auth/sign-up" />,
+  },
+  {
     path: "/auth/sign-in",
     element: <SignInPage routing="path" path="/auth/sign-in" />,
+  },
+  {
+    path: "/auth/sign-up/sso-callback", // 👈 Clerk needs this!
+    element: <SignUpCallback />
   },
   {
     path: "/my-resume/:resumeId/view",
